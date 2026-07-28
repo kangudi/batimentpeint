@@ -1,0 +1,28 @@
+# public/.htaccess
+#
+# À QUOI ÇA SERT :
+# Réécrit TOUTES les URLs demandées (sauf les vrais fichiers/dossiers
+# existants, comme assets/style.css) vers index.php, sans que ça se voie
+# dans l'adresse du navigateur.
+#
+# POURQUOI C'EST IMPORTANT :
+# Sans ce fichier, Apache chercherait un vrai fichier "clients/12" sur le
+# disque et répondrait "404 introuvable" avant même que ton Router.php
+# (dans le code PHP) ait la moindre chance de traiter l'URL. Ce fichier
+# est ce qui rend possible les URLs propres du type /clients/12 : il
+# transmet la demande à index.php, qui la transmet ensuite au Router.
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Si l'URL correspond à un vrai fichier ou un vrai dossier qui existe
+    # (ex: /assets/css/app.css), on le sert directement, sans passer par
+    # index.php : inutile de faire du routage PHP pour un fichier CSS/JS.
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Pour tout le reste, on envoie vers index.php. C'est index.php +
+    # Router.php qui décideront ensuite quoi faire de l'URL demandée.
+    RewriteRule ^ index.php [L]
+</IfModule>

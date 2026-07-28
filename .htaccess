@@ -1,0 +1,25 @@
+# .htaccess (racine du projet)
+#
+# À QUOI ÇA SERT :
+# Si ton hébergeur pointe le nom de domaine directement sur la racine du
+# projet (là où se trouvent app/, database/, composer.json...) plutôt que
+# sur le dossier public/, ce fichier redirige automatiquement toutes les
+# requêtes vers public/.
+#
+# POURQUOI C'EST IMPORTANT :
+# Le dossier public/ est le SEUL censé être accessible depuis le
+# navigateur (voir README, section 2.8). Si un visiteur pouvait accéder
+# directement à la racine, il pourrait potentiellement voir/télécharger
+# app/, .env, database/... C'est une faille de sécurité grave. Ce fichier
+# évite ce problème sur les hébergements qui ne permettent pas de changer
+# le "dossier racine du site" dans leur configuration.
+#
+# SI TON HÉBERGEUR TE PERMET DE CHOISIR public/ COMME DOSSIER RACINE DU
+# SITE (la meilleure solution, à privilégier quand c'est possible) :
+# ce fichier ne sert à rien, tu peux le supprimer.
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^$ public/ [L]
+    RewriteRule ^(?!public/)(.*)$ public/$1 [L]
+</IfModule>

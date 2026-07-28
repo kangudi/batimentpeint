@@ -1,0 +1,12 @@
+/*
+ * app.css
+ * -------
+ * À QUOI ÇA SERT :
+ * Tes ajustements de style propres au projet, en plus de Bootstrap
+ * (chargé avant ce fichier dans header.php, donc ce fichier peut
+ * surcharger les styles Bootstrap si besoin).
+ *
+ * POURQUOI UN SEUL FICHIER ET PAS UN PAR PAGE :
+ * Un seul fichier CSS chargé sur toutes les pages = le navigateur le
+ * télécharge une fois et le garde en cache pour les pages suivantes.
+ */
