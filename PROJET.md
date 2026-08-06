@@ -22,7 +22,23 @@ batimentpeint.com est une plateforme web de référence à Kinshasa dédiée à 
 
 **But métier** : Le projet "batimentpeint.com" est une plateforme web dédiée à la rénovation et à la peinture des bâtiments, principalement pour le marché de Kinshasa, qui aide les particuliers à choisir les peintures et à estimer le coût de leurs travaux. Elle met en relation les clients avec des professionnels et des fournisseurs de peinture grâce à un catalogue, un calculateur de devis et un suivi commercial. Son objectif est de générer des revenus par des commissions sur les prestations et les ventes réalisées via la plateforme.
 
-**Périmètre** : Domaine de peinture bâtiment à Kinshasa principalement / Pas en dehors du Congo Kinshasa, pas d'autre domaine que la peinture
+**Périmètre (Étape 1.2 — MCSIA)** :
+
+*Ce que le logiciel FERA :*
+- Informer l'utilisateur sur les produits de peinture bâtiment adaptés à son projet ;
+- Estimer les quantités et le coût des travaux (calculateur de devis) ;
+- Mettre en relation les particuliers/porteurs de projet avec des professionnels qualifiés de la peinture ;
+- Mettre en relation les utilisateurs avec des fournisseurs de peinture (catalogue informatif) ;
+- Permettre aux clients de laisser un avis/notation sur les professionnels, dès la première version ;
+- Fonctionner uniquement en tant que site web (pas d'application mobile prévue à ce stade).
+
+*Ce que le logiciel NE FERA PAS (pour cette version) :*
+- Aucun paiement en ligne sur la plateforme — les transactions se font directement entre le client et le professionnel/fournisseur, en dehors du site ;
+- Aucune vente directe de produits de peinture par la plateforme elle-même (pas de commande/livraison gérée en interne) ;
+- Aucune application mobile (site web uniquement) ;
+- Aucune activité hors du secteur peinture bâtiment, ni hors de Kinshasa.
+
+Domaine de peinture bâtiment à Kinshasa principalement / Pas en dehors du Congo Kinshasa, pas d'autre domaine que la peinture
 
 ---
 
