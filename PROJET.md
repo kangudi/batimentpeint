@@ -1,7 +1,7 @@
 # PROJET.md — batimentpeint.com
 
 > Ce fichier est la mémoire vive du projet. À mettre à jour à la fin de chaque session de travail.
-> Dernière mise à jour : 06 Août 2026
+> Dernière mise à jour : 07 Août 2026
 
 ---
 
@@ -42,7 +42,52 @@ Domaine de peinture bâtiment à Kinshasa principalement / Pas en dehors du Cong
 
 ---
 
-## 2. Stack technique
+## 2. Fonctionnalités et règles de gestion (Étape 2 — MCSIA)
+
+### 2.1 — Fonctionnalités (par type d'utilisateur)
+
+**Visiteur (non connecté)**
+- Le visiteur peut consulter le catalogue informatif des produits de peinture.
+- Le visiteur peut utiliser le calculateur de devis (estimation quantité/coût) sans être connecté.
+- Le visiteur peut consulter les fiches des professionnels (profil, avis, note moyenne).
+- Le visiteur peut créer un compte (particulier ou professionnel).
+
+**Particulier / porteur de projet (connecté)**
+- Le particulier peut créer et gérer son profil.
+- Le particulier peut enregistrer/sauvegarder une estimation de devis.
+- Le particulier peut rechercher des professionnels (par zone, spécialité, note).
+- Le particulier peut envoyer une demande de mise en relation à un professionnel.
+- Le particulier peut laisser un avis et une note sur un professionnel après une prestation.
+- Le particulier peut consulter l'historique de ses demandes de mise en relation.
+
+**Professionnel (connecté)**
+- Le professionnel peut créer et gérer son profil (spécialités, zone d'intervention, portfolio).
+- Le professionnel peut recevoir et consulter les demandes de mise en relation.
+- Le professionnel peut accepter ou refuser une demande de mise en relation.
+- Le professionnel peut consulter les avis et notes reçus.
+- Le professionnel doit être vérifié/validé par l'administrateur avant d'apparaître publiquement.
+
+**Administrateur**
+- L'administrateur peut valider ou rejeter l'inscription d'un professionnel.
+- L'administrateur peut gérer le catalogue de produits (ajout, modification, suppression).
+- L'administrateur peut modérer les avis (supprimer un avis abusif).
+- L'administrateur peut consulter les statistiques de mise en relation (pour le suivi commercial/commissions).
+- L'administrateur peut gérer les comptes utilisateurs (suspendre, supprimer).
+
+### 2.2 — Règles de gestion
+
+- **RG1** — Un particulier ne peut envoyer une demande de mise en relation que s'il est connecté.
+- **RG2** — Un professionnel ne peut apparaître dans les résultats de recherche que si son compte a été validé par l'administrateur.
+- **RG3** — Un particulier ne peut laisser un avis sur un professionnel que si une mise en relation a réellement eu lieu avec ce professionnel.
+- **RG4** — Un professionnel ne peut pas répondre à ses propres avis en tant que particulier (pas d'auto-évaluation).
+- **RG5** — Aucune transaction financière n'est gérée par la plateforme (conforme au périmètre — les paiements se font hors site).
+- **RG6** — Le calculateur de devis produit une estimation indicative, non contractuelle.
+- **RG7** — Un compte professionnel doit renseigner, pour être activé : au minimum une zone d'intervention à Kinshasa, ses spécialités (types de prestations proposées), et un minimum de 5 preuves vérifiables de prestations déjà réalisées (photos, références chantiers, ou équivalent).
+- **RG8** — Un avis, une fois publié, ne peut être modifié par son auteur, seulement supprimé par l'administrateur en cas d'abus.
+
+---
+
+## 3. Stack technique
 
 - Langage / version : PHP 8.x
 - Base de données : MySQL / [version]
@@ -51,7 +96,7 @@ Domaine de peinture bâtiment à Kinshasa principalement / Pas en dehors du Cong
 
 ---
 
-## 3. Architecture décidée
+## 4. Architecture décidée
 
 **Structure des dossiers** :
 ```
@@ -74,7 +119,7 @@ Domaine de peinture bâtiment à Kinshasa principalement / Pas en dehors du Cong
 
 ---
 
-## 4. Décisions techniques prises
+## 5. Décisions techniques prises
 
 | Date | Décision | Raison |
 |---|---|---|
@@ -82,27 +127,29 @@ Domaine de peinture bâtiment à Kinshasa principalement / Pas en dehors du Cong
 
 ---
 
-## 5. État d'avancement
+## 6. État d'avancement
 
 ### ✅ Fait
-- [élément terminé et testé]
+- Étape 0 — Initialisation projet (starter-kit, tickets.md)
+- Étape 1 — Vision et périmètre du projet
+- Étape 2 — Liste des fonctionnalités (2.1) et règles de gestion RG1-RG8 (2.2)
 
 ### 🔄 En cours
 - [élément en cours, avec le blocage éventuel]
 
 ### ⏳ À faire
-- [prochaine étape prévue]
+- Étape 3 — Découpage en blocs/modules
 
 ---
 
-## 6. Points de vigilance / risques connus
+## 7. Points de vigilance / risques connus
 
 - [ex: fonction X pas encore testée en charge]
 - [ex: dépendance à vérifier avec la doc officielle avant usage]
 
 ---
 
-## 7. Instructions pour Claude (à coller aussi dans les Custom Instructions du Projet)
+## 8. Instructions pour Claude (à coller aussi dans les Custom Instructions du Projet)
 
 > Avant toute proposition de code, rappelle en une ligne l'état actuel du projet selon ce fichier.
 > Si une information manque ou n'est pas dans ce fichier, demande plutôt que de supposer.
