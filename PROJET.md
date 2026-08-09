@@ -1,7 +1,7 @@
 # PROJET.md — batimentpeint.com
 
 > Ce fichier est la mémoire vive du projet. À mettre à jour à la fin de chaque session de travail.
-> Dernière mise à jour : 07 Août 2026
+> Dernière mise à jour : 09 Août 2026
 
 ---
 
@@ -46,6 +46,9 @@ Domaine de peinture bâtiment à Kinshasa principalement / Pas en dehors du Cong
 
 ### 2.1 — Fonctionnalités (par type d'utilisateur)
 
+**Transverse (tous utilisateurs, y compris visiteur)**
+- Tout utilisateur peut contacter l'administrateur via un lien direct WhatsApp ou e-mail (mailto), affiché en pied de page ou sur une page "Contact". Aucune donnée n'est enregistrée par la plateforme pour ce canal.
+
 **Visiteur (non connecté)**
 - Le visiteur peut consulter le catalogue informatif des produits de peinture.
 - Le visiteur peut utiliser le calculateur de devis (estimation quantité/coût) sans être connecté.
@@ -87,7 +90,31 @@ Domaine de peinture bâtiment à Kinshasa principalement / Pas en dehors du Cong
 
 ---
 
-## 3. Stack technique
+## 3. Découpage en blocs / modules (Étape 3 — MCSIA)
+
+En regroupant les fonctionnalités de la section 2.1 par cohérence métier, le projet est découpé en **6 modules** :
+
+**1. Module `Utilisateurs`**
+Gestion des comptes (particulier, professionnel, administrateur), authentification, profils. Inclut la validation d'un compte professionnel par l'administrateur (RG7 : zone d'intervention, spécialités, 5 preuves vérifiables). Inclut également l'affichage du canal de contact direct vers l'administrateur (WhatsApp/e-mail).
+
+**2. Module `Catalogue`**
+Fiches informatives des produits de peinture bâtiment, consultables par tout visiteur. Gestion (ajout/modification/suppression) réservée à l'administrateur.
+
+**3. Module `Devis`**
+Le calculateur d'estimation (quantité/coût), accessible sans connexion, avec possibilité de sauvegarde pour un particulier connecté. Estimation non contractuelle (RG6).
+
+**4. Module `MiseEnRelation`**
+Recherche de professionnels (zone, spécialité, note), envoi de demandes par un particulier, réception/acceptation/refus côté professionnel, historique des demandes. Ne concerne que des professionnels validés (RG2).
+
+**5. Module `Avis`**
+Dépôt d'un avis/note par un particulier après une mise en relation effective (RG3), consultation par le professionnel, modération par l'administrateur (RG8).
+
+**6. Module `Statistiques`**
+Reporting et suivi commercial pour l'administrateur (nombre de mises en relation, taux de conversion, activité par professionnel, etc.), utilisé pour le pilotage du modèle de commission. S'appuie sur les données du module `MiseEnRelation`, mais reste isolé comme module autonome pour permettre une évolution indépendante (ex. tableaux de bord, exports).
+
+---
+
+## 4. Stack technique
 
 - Langage / version : PHP 8.x
 - Base de données : MySQL / [version]
@@ -96,7 +123,7 @@ Domaine de peinture bâtiment à Kinshasa principalement / Pas en dehors du Cong
 
 ---
 
-## 4. Architecture décidée
+## 5. Architecture décidée
 
 **Structure des dossiers** :
 ```
@@ -119,7 +146,7 @@ Domaine de peinture bâtiment à Kinshasa principalement / Pas en dehors du Cong
 
 ---
 
-## 5. Décisions techniques prises
+## 6. Décisions techniques prises
 
 | Date | Décision | Raison |
 |---|---|---|
@@ -127,29 +154,30 @@ Domaine de peinture bâtiment à Kinshasa principalement / Pas en dehors du Cong
 
 ---
 
-## 6. État d'avancement
+## 7. État d'avancement
 
 ### ✅ Fait
 - Étape 0 — Initialisation projet (starter-kit, tickets.md)
 - Étape 1 — Vision et périmètre du projet
-- Étape 2 — Liste des fonctionnalités (2.1) et règles de gestion RG1-RG8 (2.2)
+- Étape 2 — Liste des fonctionnalités (2.1, incluant le contact admin transverse) et règles de gestion RG1-RG8 (2.2)
+- Étape 3 — Découpage en 6 blocs/modules (Utilisateurs, Catalogue, Devis, MiseEnRelation, Avis, Statistiques)
 
 ### 🔄 En cours
 - [élément en cours, avec le blocage éventuel]
 
 ### ⏳ À faire
-- Étape 3 — Découpage en blocs/modules
+- Étape 4 — Dessiner les données (MCD → MLD → MPD → MySQL)
 
 ---
 
-## 7. Points de vigilance / risques connus
+## 8. Points de vigilance / risques connus
 
 - [ex: fonction X pas encore testée en charge]
 - [ex: dépendance à vérifier avec la doc officielle avant usage]
 
 ---
 
-## 8. Instructions pour Claude (à coller aussi dans les Custom Instructions du Projet)
+## 9. Instructions pour Claude (à coller aussi dans les Custom Instructions du Projet)
 
 > Avant toute proposition de code, rappelle en une ligne l'état actuel du projet selon ce fichier.
 > Si une information manque ou n'est pas dans ce fichier, demande plutôt que de supposer.
