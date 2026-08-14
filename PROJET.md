@@ -1,7 +1,7 @@
 # PROJET.md — batimentpeint.com
 
 > Ce fichier est la mémoire vive du projet. À mettre à jour à la fin de chaque session de travail.
-> Dernière mise à jour : 12 Août 2026
+> Dernière mise à jour : 14 Août 2026
 
 ---
 
@@ -173,6 +173,8 @@ Gestion éditoriale d'articles et astuces (ex. "comment traiter l'humidité sur 
 | 12/08 | Ajout du module `Contenu` (articles/astuces) en scope additionnel | Levier d'acquisition de trafic organique (SEO) en amont du besoin |
 | 12/08 | Taxonomie d'articles distincte de la taxonomie produit | Les rubriques éditoriales ne recoupent pas nécessairement les catégories catalogue |
 | 12/08 | Commentaires ouverts aux visiteurs non connectés (nom/e-mail) | Maximiser l'engagement et le contenu généré, cohérent avec un objectif SEO |
+| 14/08 | Association `Article ↔ Produit` transformée en table de liaison `ARTICLE_PRODUIT` (MLD) | Association N,N sans attribut propre |
+| 14/08 | `AVIS.#id_demande` contraint unique au MPD | Garantir RG3 : une demande ne génère au plus qu'un avis |
 
 ---
 
@@ -183,13 +185,13 @@ Gestion éditoriale d'articles et astuces (ex. "comment traiter l'humidité sur 
 - Étape 1 — Vision et périmètre du projet
 - Étape 2 — Liste des fonctionnalités (2.1, incluant le contact admin transverse et le module Contenu) et règles de gestion RG1-RG12 (2.2)
 - Étape 3 — Découpage en 7 blocs/modules (Utilisateurs, Catalogue, Devis, MiseEnRelation, Avis, Statistiques, Contenu)
-- Étape 4.1 — MCD validé : 12 entités (`Utilisateur`, `Professionnel`, `Preuve`, `Categorie`, `Produit`, `Devis`, `LigneDevis`, `DemandeMiseEnRelation`, `Avis`, `CategorieArticle`, `Article`, `Commentaire`)
+- Étape 4.1 — MCD validé : 12 entités
+- Étape 4.2 — MLD validé : 13 tables (12 entités + table de liaison `ARTICLE_PRODUIT`)
 
 ### 🔄 En cours
-- Étape 4.2 — MLD (transformation du MCD en tableaux/colonnes)
+- Étape 4.3 — MPD (typage MySQL, clés, contraintes)
 
 ### ⏳ À faire
-- Étape 4.2 — MLD
 - Étape 4.3 — MPD
 - Étape 4.4 — Script MySQL de création des tables
 
@@ -201,10 +203,43 @@ Gestion éditoriale d'articles et astuces (ex. "comment traiter l'humidité sur 
 - [ex: dépendance à vérifier avec la doc officielle avant usage]
 - RG7 (minimum 5 preuves) est une règle métier non modélisable par une cardinalité MCD stricte : à faire respecter au niveau applicatif (Étape 7).
 - Les commentaires de visiteurs non connectés (RG11) nécessitent une vigilance anti-spam à prévoir en Étape 7 (captcha, rate-limiting, ou modération a priori à trancher plus tard).
+- `COMMENTAIRE.id_utilisateur` nullable + `nom_auteur`/`email_auteur` : la cohérence (l'un ou l'autre renseigné) devra être vérifiée applicativement, pas au niveau MPD.
 
 ---
 
-## 9. Instructions pour Claude (à coller aussi dans les Custom Instructions du Projet)
+## 9. Annexe technique — MLD (Étape 4.2, validé le 14/08/2026)
+
+```
+UTILISATEUR(id_utilisateur, nom, prenom, email, mot_de_passe, telephone, type_utilisateur, date_inscription, statut_compte)
+
+PROFESSIONNEL(id_professionnel, #id_utilisateur, zone_intervention, specialites, statut_validation, date_validation, #id_admin_validateur)
+
+PREUVE(id_preuve, #id_professionnel, type_preuve, chemin_fichier, date_ajout)
+
+CATEGORIE(id_categorie, nom, slug, description, meta_titre, meta_description, image_categorie)
+
+PRODUIT(id_produit, #id_categorie, nom, slug, description_courte, description_longue, marque, unite, rendement, prix_indicatif, image_principale, texte_alt_image, meta_titre, meta_description, mots_cles, date_publication, date_maj, statut_publication)
+
+DEVIS(id_devis, #id_utilisateur, date_creation, surface_totale, cout_total_estime, statut)
+
+LIGNE_DEVIS(id_ligne_devis, #id_devis, #id_produit, quantite, surface_associee, cout_ligne)
+
+DEMANDE_MISE_EN_RELATION(id_demande, #id_utilisateur, #id_professionnel, date_demande, statut, message)
+
+AVIS(id_avis, #id_demande, note, commentaire, date_avis, statut_moderation)
+
+CATEGORIE_ARTICLE(id_categorie_article, nom, slug, description, meta_titre, meta_description)
+
+ARTICLE(id_article, #id_utilisateur, #id_categorie_article, titre, slug, extrait, contenu, image_principale, texte_alt_image, meta_titre, meta_description, mots_cles, date_publication, date_maj, statut_publication)
+
+COMMENTAIRE(id_commentaire, #id_article, #id_utilisateur, nom_auteur, email_auteur, contenu, date_commentaire, statut_moderation)
+
+ARTICLE_PRODUIT(#id_article, #id_produit)
+```
+
+---
+
+## 10. Instructions pour Claude (à coller aussi dans les Custom Instructions du Projet)
 
 > Avant toute proposition de code, rappelle en une ligne l'état actuel du projet selon ce fichier.
 > Si une information manque ou n'est pas dans ce fichier, demande plutôt que de supposer.
