@@ -1,7 +1,7 @@
 # PROJET.md — batimentpeint.com
 
 > Ce fichier est la mémoire vive du projet. À mettre à jour à la fin de chaque session de travail.
-> Dernière mise à jour : 14 Août 2026
+> Dernière mise à jour : 15 Août 2026
 
 ---
 
@@ -133,7 +133,7 @@ Gestion éditoriale d'articles et astuces (ex. "comment traiter l'humidité sur 
 ## 4. Stack technique
 
 - Langage / version : PHP 8.x
-- Base de données : MySQL / [version]
+- Base de données : MySQL 8.x
 - Front : Bootstrap / jQuery / [autres]
 - Autres dépendances : [Composer packages, etc.]
 
@@ -175,6 +175,10 @@ Gestion éditoriale d'articles et astuces (ex. "comment traiter l'humidité sur 
 | 12/08 | Commentaires ouverts aux visiteurs non connectés (nom/e-mail) | Maximiser l'engagement et le contenu généré, cohérent avec un objectif SEO |
 | 14/08 | Association `Article ↔ Produit` transformée en table de liaison `ARTICLE_PRODUIT` (MLD) | Association N,N sans attribut propre |
 | 14/08 | `AVIS.#id_demande` contraint unique au MPD | Garantir RG3 : une demande ne génère au plus qu'un avis |
+| 15/08 | `AVIS.note` typée `TINYINT` + `CHECK (note BETWEEN 1 AND 5)` | Notation sur 5, contrainte posée faute de RG explicite |
+| 15/08 | Statuts (`statut_validation`, `statut_publication`, `statut_moderation`, etc.) typés en `ENUM` avec valeurs par défaut | Cohérence avec les RG, listes fermées définies faute d'énumération explicite dans les RG |
+| 15/08 | Stratégies `ON DELETE` différenciées : `CASCADE` (données dépendantes du parent), `RESTRICT` (données référencées ailleurs), `SET NULL` (liens optionnels) | Choix posé au niveau MPD, faute de règle de gestion explicite — à surveiller en cas d'évolution métier |
+| 15/08 | Script `schema.sql` testé fonctionnellement (création, insertions valides, rejets de cas invalides, cascade de suppression) sur MySQL/MariaDB avant livraison | Fiabiliser le script avant mise en base réelle, au-delà d'une simple vérification syntaxique |
 
 ---
 
@@ -187,13 +191,16 @@ Gestion éditoriale d'articles et astuces (ex. "comment traiter l'humidité sur 
 - Étape 3 — Découpage en 7 blocs/modules (Utilisateurs, Catalogue, Devis, MiseEnRelation, Avis, Statistiques, Contenu)
 - Étape 4.1 — MCD validé : 12 entités
 - Étape 4.2 — MLD validé : 13 tables (12 entités + table de liaison `ARTICLE_PRODUIT`)
+- Étape 4.3 — MPD validé : typage MySQL, clés, contraintes
+- Étape 4.4 — Script `schema.sql` généré et **testé fonctionnellement** (création des 13 tables, FK, `UNIQUE`, `CHECK`, cascades) — **Étape 4 entièrement clôturée**
 
 ### 🔄 En cours
-- Étape 4.3 — MPD (typage MySQL, clés, contraintes)
+- Étape 5 — Diagramme de classes / cas d'utilisation (UML) — à démarrer
 
 ### ⏳ À faire
-- Étape 4.3 — MPD
-- Étape 4.4 — Script MySQL de création des tables
+- Étape 5 — UML (diagramme de classes obligatoire, cas d'utilisation)
+- Étape 6 — Organisation des dossiers du code
+- Étape 7 — Développement PHP module par module
 
 ---
 
@@ -204,6 +211,7 @@ Gestion éditoriale d'articles et astuces (ex. "comment traiter l'humidité sur 
 - RG7 (minimum 5 preuves) est une règle métier non modélisable par une cardinalité MCD stricte : à faire respecter au niveau applicatif (Étape 7).
 - Les commentaires de visiteurs non connectés (RG11) nécessitent une vigilance anti-spam à prévoir en Étape 7 (captcha, rate-limiting, ou modération a priori à trancher plus tard).
 - `COMMENTAIRE.id_utilisateur` nullable + `nom_auteur`/`email_auteur` : la cohérence (l'un ou l'autre renseigné) devra être vérifiée applicativement, pas au niveau MPD.
+- Les stratégies `ON DELETE` (section 6) reflètent des hypothèses raisonnables mais n'ont pas été formellement validées comme règle de gestion — à reconfirmer si le comportement de suppression en cascade pose problème en production (ex. suppression d'un compte utilisateur supprimant automatiquement ses devis).
 
 ---
 
@@ -239,7 +247,16 @@ ARTICLE_PRODUIT(#id_article, #id_produit)
 
 ---
 
-## 10. Instructions pour Claude (à coller aussi dans les Custom Instructions du Projet)
+## 10. Annexe technique — MPD & script SQL (Étape 4.3-4.4, validé le 15/08/2026)
+
+- Typage complet MySQL 8 (`INT UNSIGNED`, `VARCHAR(n)`, `TEXT`/`LONGTEXT`, `DECIMAL`, `ENUM`, `DATETIME`) pour les 13 tables du MLD.
+- Contraintes ajoutées au MPD : `UNIQUE` (email, slugs, `AVIS.id_demande`), `CHECK (note BETWEEN 1 AND 5)`, valeurs par défaut (`DEFAULT CURRENT_TIMESTAMP`, statuts par défaut).
+- Script de création : `schema.sql` (livré, moteur InnoDB, charset utf8mb4, ordre de création respectant les dépendances de clés étrangères).
+- **Tests fonctionnels réalisés le 15/08** (voir section 6) : création des tables sans erreur, insertion d'un scénario de données réaliste couvrant les 7 modules, rejet vérifié des cas invalides (note hors plage, doublon d'avis sur une même demande, email dupliqué, clé étrangère inexistante), suppression en cascade vérifiée (`DEVIS` → `LIGNE_DEVIS`).
+
+---
+
+## 11. Instructions pour Claude (à coller aussi dans les Custom Instructions du Projet)
 
 > Avant toute proposition de code, rappelle en une ligne l'état actuel du projet selon ce fichier.
 > Si une information manque ou n'est pas dans ce fichier, demande plutôt que de supposer.
