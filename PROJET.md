@@ -1,7 +1,7 @@
 # PROJET.md — batimentpeint.com
 
 > Ce fichier est la mémoire vive du projet. À mettre à jour à la fin de chaque session de travail.
-> Dernière mise à jour : 15 Août 2026
+> Dernière mise à jour : 19 Août 2026
 
 ---
 
@@ -133,7 +133,7 @@ Gestion éditoriale d'articles et astuces (ex. "comment traiter l'humidité sur 
 ## 4. Stack technique
 
 - Langage / version : PHP 8.x
-- Base de données : MySQL 8.x
+- Base de données : MySQL / [version]
 - Front : Bootstrap / jQuery / [autres]
 - Autres dépendances : [Composer packages, etc.]
 
@@ -141,24 +141,68 @@ Gestion éditoriale d'articles et astuces (ex. "comment traiter l'humidité sur 
 
 ## 5. Architecture décidée
 
-**Structure des dossiers** :
+**Structure des dossiers** (Étape 6.1 + 6.2, validée le 19/08/2026) :
 ```
-/src
-  /Domain
-  /Application
-  /Infrastructure
-/public
+/app
+  /Users          (module Utilisateurs)
+    /Domain
+    /Application
+    /Infrastructure
+    /Presentation
+  /Catalog        (module Catalogue)
+    /Domain
+    /Application
+    /Infrastructure
+    /Presentation
+  /Quotes         (module Devis)
+    /Domain
+    /Application
+    /Infrastructure
+    /Presentation
+  /Connections    (module MiseEnRelation)
+    /Domain
+    /Application
+    /Infrastructure
+    /Presentation
+  /Reviews        (module Avis)
+    /Domain
+    /Application
+    /Infrastructure
+    /Presentation
+  /Statistics     (module Statistiques)
+    /Domain
+    /Application
+    /Infrastructure
+    /Presentation
+  /Content        (module Contenu)
+    /Domain
+    /Application
+    /Infrastructure
+    /Presentation
+  /Core           (config, connexion MySQL, routeur, bootstrap)
+  /Shared         (code réutilisable transverse : upload, pagination, helpers SEO...)
+/public           (point d'entrée web : index.php, assets)
 /tests
-...
+  /Users
+  /Catalog
+  /Quotes
+  /Connections
+  /Reviews
+  /Statistics
+  /Content
 ```
+
+Correspondance modules FR (Étape 3) → dossiers EN (code) : Utilisateurs→`Users`, Catalogue→`Catalog`, Devis→`Quotes`, MiseEnRelation→`Connections`, Avis→`Reviews`, Statistiques→`Statistics`, Contenu→`Content`. La terminologie métier française reste la référence fonctionnelle (présente doc, MCD/MLD/MPD, diagrammes UML) ; les noms anglais ne s'appliquent qu'à l'arborescence de code et, en Étape 7, aux classes PHP.
+
+Chaque dossier feuille contient un `.gitkeep` pour permettre son versionnement Git à vide, avant écriture du code métier (Étape 7).
 
 **Classes / modules principaux** :
 | Classe / Module | Rôle | Statut |
 |---|---|---|
-| ex: `UserRepository` | Accès aux données utilisateurs | ✅ Fait |
-| ex: `InvoiceService` | Logique de facturation | 🔄 En cours |
+| ex: `UserRepository` | Accès aux données utilisateurs | ⏳ À faire (Étape 7) |
+| ex: `QuoteService` | Logique de calcul de devis | ⏳ À faire (Étape 7) |
 
-**Conventions de nommage** : [PascalCase pour les classes, snake_case pour les tables, etc.]
+**Conventions de nommage** : PascalCase pour les classes PHP, snake_case pour les tables MySQL (déjà appliqué au MPD), noms de dossiers de modules en anglais (voir correspondance ci-dessus).
 
 ---
 
@@ -175,10 +219,13 @@ Gestion éditoriale d'articles et astuces (ex. "comment traiter l'humidité sur 
 | 12/08 | Commentaires ouverts aux visiteurs non connectés (nom/e-mail) | Maximiser l'engagement et le contenu généré, cohérent avec un objectif SEO |
 | 14/08 | Association `Article ↔ Produit` transformée en table de liaison `ARTICLE_PRODUIT` (MLD) | Association N,N sans attribut propre |
 | 14/08 | `AVIS.#id_demande` contraint unique au MPD | Garantir RG3 : une demande ne génère au plus qu'un avis |
-| 15/08 | `AVIS.note` typée `TINYINT` + `CHECK (note BETWEEN 1 AND 5)` | Notation sur 5, contrainte posée faute de RG explicite |
-| 15/08 | Statuts (`statut_validation`, `statut_publication`, `statut_moderation`, etc.) typés en `ENUM` avec valeurs par défaut | Cohérence avec les RG, listes fermées définies faute d'énumération explicite dans les RG |
-| 15/08 | Stratégies `ON DELETE` différenciées : `CASCADE` (données dépendantes du parent), `RESTRICT` (données référencées ailleurs), `SET NULL` (liens optionnels) | Choix posé au niveau MPD, faute de règle de gestion explicite — à surveiller en cas d'évolution métier |
-| 15/08 | Script `schema.sql` testé fonctionnellement (création, insertions valides, rejets de cas invalides, cascade de suppression) sur MySQL/MariaDB avant livraison | Fiabiliser le script avant mise en base réelle, au-delà d'une simple vérification syntaxique |
+| 18/08 | `Professionnel` modélisé en association avec `Utilisateur` (1 -- 0..1) dans le diagramme de classes UML | Cohérence stricte avec le MLD/MPD déjà validés (table séparée avec `#id_utilisateur`) |
+| 18/08 | Diagramme de cas d'utilisation organisé en 4 diagrammes séparés (un par acteur) plutôt qu'un diagramme global | Lisibilité ; chaque acteur (Visiteur, Particulier, Professionnel, Administrateur) a un périmètre d'action distinct |
+| 18/08 | Étape 5.3 (diagramme de séquence) non réalisée | Aucune action du projet n'est jugée assez complexe (pas de paiement en ligne, pas d'automatisation d'e-mail) |
+| 19/08 | Racine du code applicatif : `/app` (remplace `/src` esquissé initialement en section 5) | Choix validé par Kangudi à l'Étape 6.1 |
+| 19/08 | 4 sous-dossiers par module (Domain / Application / Infrastructure / Presentation) | Séparation stricte métier / service / accès données / contrôleur, alignée sur l'ordre d'écriture du code en Étape 7 |
+| 19/08 | Noms de dossiers de modules traduits en anglais (`Users`, `Catalog`, `Quotes`, `Connections`, `Reviews`, `Statistics`, `Content`) | Convention de code plus courante ; la terminologie métier française reste la référence fonctionnelle |
+| 19/08 | `Core` et `Shared` ajoutés en dossiers transverses hors modules | `Core` = infrastructure technique commune (DB, routeur) ; `Shared` = composants réutilisables non spécifiques à un module |
 
 ---
 
@@ -191,16 +238,21 @@ Gestion éditoriale d'articles et astuces (ex. "comment traiter l'humidité sur 
 - Étape 3 — Découpage en 7 blocs/modules (Utilisateurs, Catalogue, Devis, MiseEnRelation, Avis, Statistiques, Contenu)
 - Étape 4.1 — MCD validé : 12 entités
 - Étape 4.2 — MLD validé : 13 tables (12 entités + table de liaison `ARTICLE_PRODUIT`)
-- Étape 4.3 — MPD validé : typage MySQL, clés, contraintes
-- Étape 4.4 — Script `schema.sql` généré et **testé fonctionnellement** (création des 13 tables, FK, `UNIQUE`, `CHECK`, cascades) — **Étape 4 entièrement clôturée**
+- Étape 4.3 — MPD validé : typage MySQL 8 (ENUM, TINYINT/CHECK, DECIMAL, LONGTEXT), clés et contraintes
+- Étape 4.4 — `schema.sql` testé en MariaDB (insertions valides, violations de contraintes, suppressions en cascade)
+- Étape 5.1 — Diagramme de classes UML validé : 12 classes Domain, méthodes dérivées de RG1-RG12 (`uml_classes_batimentpeint.mermaid`)
+- Étape 5.2 — Diagramme de cas d'utilisation validé : 4 diagrammes séparés, un par acteur (`uml_cas_utilisation_batimentpeint.md`)
+- Étape 5.3 — non réalisée (décision actée : aucune action assez complexe pour la justifier)
+- **Étape 5 entièrement close**
+- Étape 6.1 — Un dossier par bloc/module créé (`app/Users`, `app/Catalog`, `app/Quotes`, `app/Connections`, `app/Reviews`, `app/Statistics`, `app/Content`, + `Core` et `Shared`)
+- Étape 6.2 — 4 sous-dossiers par module (Domain/Application/Infrastructure/Presentation) créés ; arborescence validée le 19/08/2026 (`arborescence_batimentpeint.zip`, `arborescence_batimentpeint.md`)
 
 ### 🔄 En cours
-- Étape 5 — Diagramme de classes / cas d'utilisation (UML) — à démarrer
+- Étape 6.3 — Consigner la décision d'architecture dans un `decisions.md` (ou confirmer que le tableau section 6 de ce fichier en tient lieu)
 
 ### ⏳ À faire
-- Étape 5 — UML (diagramme de classes obligatoire, cas d'utilisation)
-- Étape 6 — Organisation des dossiers du code
-- Étape 7 — Développement PHP module par module
+- Étape 6.3 — Finaliser la traçabilité de la décision d'architecture
+- Étape 7 — Écriture du code PHP, module par module
 
 ---
 
@@ -211,7 +263,6 @@ Gestion éditoriale d'articles et astuces (ex. "comment traiter l'humidité sur 
 - RG7 (minimum 5 preuves) est une règle métier non modélisable par une cardinalité MCD stricte : à faire respecter au niveau applicatif (Étape 7).
 - Les commentaires de visiteurs non connectés (RG11) nécessitent une vigilance anti-spam à prévoir en Étape 7 (captcha, rate-limiting, ou modération a priori à trancher plus tard).
 - `COMMENTAIRE.id_utilisateur` nullable + `nom_auteur`/`email_auteur` : la cohérence (l'un ou l'autre renseigné) devra être vérifiée applicativement, pas au niveau MPD.
-- Les stratégies `ON DELETE` (section 6) reflètent des hypothèses raisonnables mais n'ont pas été formellement validées comme règle de gestion — à reconfirmer si le comportement de suppression en cascade pose problème en production (ex. suppression d'un compte utilisateur supprimant automatiquement ses devis).
 
 ---
 
@@ -247,12 +298,30 @@ ARTICLE_PRODUIT(#id_article, #id_produit)
 
 ---
 
-## 10. Annexe technique — MPD & script SQL (Étape 4.3-4.4, validé le 15/08/2026)
+## 10. Annexe technique — UML (Étape 5, validée le 18/08/2026)
 
-- Typage complet MySQL 8 (`INT UNSIGNED`, `VARCHAR(n)`, `TEXT`/`LONGTEXT`, `DECIMAL`, `ENUM`, `DATETIME`) pour les 13 tables du MLD.
-- Contraintes ajoutées au MPD : `UNIQUE` (email, slugs, `AVIS.id_demande`), `CHECK (note BETWEEN 1 AND 5)`, valeurs par défaut (`DEFAULT CURRENT_TIMESTAMP`, statuts par défaut).
-- Script de création : `schema.sql` (livré, moteur InnoDB, charset utf8mb4, ordre de création respectant les dépendances de clés étrangères).
-- **Tests fonctionnels réalisés le 15/08** (voir section 6) : création des tables sans erreur, insertion d'un scénario de données réaliste couvrant les 7 modules, rejet vérifié des cas invalides (note hors plage, doublon d'avis sur une même demande, email dupliqué, clé étrangère inexistante), suppression en cascade vérifiée (`DEVIS` → `LIGNE_DEVIS`).
+**5.1 — Diagramme de classes** (`uml_classes_batimentpeint.mermaid`) : 12 classes Domain correspondant aux entités du MLD (`ARTICLE_PRODUIT` reste une association N,N, pas une classe). Attributs alignés sur les colonnes du MPD ; convention PHP camelCase à appliquer en Étape 7. `Professionnel` modélisé en association avec `Utilisateur` (1 -- 0..1), pas en héritage.
+
+Méthodes issues des règles de gestion :
+
+| RG | Méthode | Classe |
+|---|---|---|
+| RG1 | `envoyer(demandeur)` | `DemandeMiseEnRelation` |
+| RG2 | `estValide()` | `Professionnel` |
+| RG3 | `peutRecevoirAvis()` | `DemandeMiseEnRelation` |
+| RG4 | `estAutoEvaluation(demande, auteur)` | `Avis` |
+| RG5 | *(aucune méthode — pas de classe paiement)* | — |
+| RG6 | `estIndicatif()` | `Devis` |
+| RG7 | `peutEtreActive()` | `Professionnel` |
+| RG8 | `estModifiableParAuteur()` / `supprimerParAdmin()` | `Avis` |
+| RG9 | `estVisiblePubliquement()` | `Article` |
+| RG10 | `publier(auteur)` | `Article` |
+| RG11 | `estValide()` | `Commentaire` |
+| RG12 | `supprimerParAdmin()` | `Commentaire` |
+
+**5.2 — Diagramme de cas d'utilisation** (`uml_cas_utilisation_batimentpeint.md`) : 4 diagrammes séparés, un par acteur (Visiteur, Particulier, Professionnel, Administrateur), dérivés strictement de la section 2.1. Le contact transverse vers l'administrateur apparaît dans les diagrammes Visiteur, Particulier et Professionnel.
+
+**5.3 — Diagramme de séquence** : non réalisé. Aucune action du projet (pas de paiement en ligne, pas d'automatisation d'e-mail) n'a été jugée assez complexe pour le justifier.
 
 ---
 
